@@ -25,36 +25,34 @@ public class ClientDao implements DaoRentCar<Long, Client> {
             """;
 
     public static final String ADD_CLIENT_SQL = """
-            INSERT INTO client(fio, age, licence_no, validity, login, password, role_id) 
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO client(user_id, age, licence_no, validity) 
+            VALUES (?,  ?, ?, ?)
             """;
 
     public static final String UPDATE_CLIENT_SQL = """
             UPDATE client
-            SET fio = ?,
+            SET user_id = ?,
             age = ?,
             licence_no = ?,
-            validity = ?,
-            login = ?,
-            password = ?,
-            role_id = ?
+            validity = ?
             WHERE id = ?
             """;
 
     public static final String FIND_ALL_CLIENTS_SQL = """
             SELECT id,
-            fio,
+            user_id,
             age,
             licence_no,
-            validity,
-            login,
-            password,
-            role_id
+            validity
             FROM client
             """;
-
     public static final String FIND_CLIENT_BY_ID_SQL = FIND_ALL_CLIENTS_SQL + """
             WHERE id = ?
+            """;
+    private static final String FIND_CLIENT_ID_BY_USER_ID = """
+            SELECT id
+            FROM client 
+            WHERE user_id = ?
             """;
 
     private ClientDao() {}
@@ -63,13 +61,10 @@ public class ClientDao implements DaoRentCar<Long, Client> {
     public void update(Client client) {
         try (Connection connection = RentCarsConnectionManager.open();
         PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_CLIENT_SQL)) {
-        preparedStatement.setString(1, client.getFio());
+        preparedStatement.setInt(1, client.getUserId());
         preparedStatement.setInt(2, client.getAge());
         preparedStatement.setInt(3, client.getLicenceNo());
         preparedStatement.setTimestamp(4, Timestamp.valueOf(client.getValidity().atStartOfDay()));
-        preparedStatement.setString(5, client.getLogin());
-        preparedStatement.setString(6, client.getPassword());
-        preparedStatement.setInt(7, client.getRoleId());
         preparedStatement.setLong(8, client.getId());
 
         preparedStatement.executeUpdate();
@@ -81,18 +76,9 @@ public class ClientDao implements DaoRentCar<Long, Client> {
     public List<Client> findClientWithFilters(ClientFilter clientFilter) {
         List<Object> parameters = new ArrayList<>();
         List<String> whereSQL = new ArrayList<>();
-
-        if (clientFilter.fio() != null) {
-            whereSQL.add("fio LIKE ? ");
-            parameters.add("%" + clientFilter.fio() + "%");
-        }
         if (clientFilter.licenceNo() != null) {
             whereSQL.add("licence_no = ? ");
             parameters.add(clientFilter.licenceNo());
-        }
-        if (clientFilter.login() != null) {
-            whereSQL.add("login LIKE ? ");
-            parameters.add("%" + clientFilter.login() + "%");
         }
         parameters.add(clientFilter.limit());
         parameters.add(clientFilter.offset());
@@ -142,6 +128,23 @@ public class ClientDao implements DaoRentCar<Long, Client> {
         }
     }
 
+    public Optional<Integer> findClientIdByUserId(Integer userId) {
+        try (Connection connection = RentCarsConnectionManager.open();
+        var preparedStatement = connection.prepareStatement(FIND_CLIENT_ID_BY_USER_ID)) {
+            preparedStatement.setInt(1, userId);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+            Integer id = null;
+            if (resultSet.next()) {
+                id = resultSet.getInt("id");
+            }
+            return Optional.ofNullable(id);
+
+        } catch (SQLException throwables) {
+            throw new RentCarsDaoException(throwables);
+        }
+    }
+
     @Override
     public List<Client> findAll() {
         try (Connection connection = RentCarsConnectionManager.open();
@@ -158,29 +161,30 @@ public class ClientDao implements DaoRentCar<Long, Client> {
     }
 
     private Client buildClient(ResultSet resultSet) throws SQLException {
-        return new Client(
+        /*return new Client(
                 resultSet.getLong("id"),
-                resultSet.getString("fio"),
+                resultSet.getInt("user_id"),
                 resultSet.getInt("age"),
                 resultSet.getInt("licence_no"),
-                resultSet.getDate("validity").toLocalDate(),
-                resultSet.getString("login"),
-                resultSet.getString("password"),
-                resultSet.getInt("role_id")
-        );
+                resultSet.getDate("validity").toLocalDate()
+        );*/
+        return Client.builder()
+                .id(resultSet.getLong("id"))
+                .userId(resultSet.getInt("user_id"))
+                .age(resultSet.getInt("age"))
+                .licenceNo(resultSet.getInt("licence_no"))
+                .validity(resultSet.getDate("validity").toLocalDate())
+                .build();
     }
 
     @Override
     public Client add(Client client) {
         try (Connection connection = RentCarsConnectionManager.open();
              PreparedStatement preparedStatement = connection.prepareStatement(ADD_CLIENT_SQL, Statement.RETURN_GENERATED_KEYS)) {
-            preparedStatement.setString(1, client.getFio());
+            preparedStatement.setInt(1, client.getUserId());
             preparedStatement.setInt(2, client.getAge());
             preparedStatement.setInt(3, client.getLicenceNo());
             preparedStatement.setTimestamp(4, Timestamp.valueOf(client.getValidity().atStartOfDay()));
-            preparedStatement.setString(5, client.getLogin());
-            preparedStatement.setString(6, client.getPassword());
-            preparedStatement.setInt(7, client.getRoleId());
 
             preparedStatement.executeUpdate();
             ResultSet generatedKeys = preparedStatement.getGeneratedKeys();

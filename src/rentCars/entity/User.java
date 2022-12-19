@@ -4,17 +4,16 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDate;
+import rentCars.entity.enums.RoleEnum;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Client {
-    private Long id;
-    private Integer userId;
-    private Integer age;
-    private Integer licenceNo;
-    private LocalDate validity;
+public class User {
+    private Integer id;
+    private String fio;
+    private String login;
+    private String password;
+    private RoleEnum role;
 }

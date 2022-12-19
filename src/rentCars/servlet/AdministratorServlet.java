@@ -6,10 +6,9 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import rentCars.service.AdministratorService;
+import rentCars.util.JSPHelper;
 
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.nio.charset.StandardCharsets;
 
 @WebServlet("/admins")
 public class AdministratorServlet extends HttpServlet {
@@ -17,7 +16,12 @@ public class AdministratorServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        resp.setContentType("text/html");
+        req.setAttribute("admins", administratorService.findAll());
+
+        req.getRequestDispatcher(JSPHelper.getPath("administrators"))
+                        .forward(req, resp);
+
+        /*resp.setContentType("text/html");
         resp.setCharacterEncoding(StandardCharsets.UTF_8.name());
 
         try (PrintWriter printWriter = resp.getWriter()) {
@@ -31,6 +35,6 @@ public class AdministratorServlet extends HttpServlet {
                         """.formatted(administratorDto.getId(), administratorDto.getDescription()));
             });
             printWriter.write("</ul>");
-        }
+        }*/
     }
 }

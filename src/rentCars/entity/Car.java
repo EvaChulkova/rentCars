@@ -3,7 +3,6 @@ package rentCars.entity;
 import rentCars.entity.enums.CarColorEnum;
 import rentCars.entity.enums.CarStatusEnum;
 
-import java.math.BigDecimal;
 import java.util.Objects;
 
 public class Car {
@@ -11,30 +10,52 @@ public class Car {
     private String brand;
     private CarColorEnum color;
     private Integer seatAmount;
-    private BigDecimal price;
+    private Integer price;
     private CarStatusEnum status;
+    private String image;
 
     public Car(){}
 
-    public Car(Long id, String brand, CarColorEnum color, Integer seatAmount, BigDecimal price, CarStatusEnum status) {
+    public Car(Long id, String brand, CarColorEnum color, Integer seatAmount, Integer price, CarStatusEnum status, String image) {
         this.id = id;
         this.brand = brand;
         this.color = color;
         this.seatAmount = seatAmount;
         this.price = price;
         this.status = status;
+        this.image = image;
     }
+
+    public Car(String brand, CarColorEnum color, Integer seatAmount, Integer price, CarStatusEnum status, String image) {
+        this.brand = brand;
+        this.color = color;
+        this.seatAmount = seatAmount;
+        this.price = price;
+        this.status = status;
+        this.image = image;
+    }
+
+    public Car(String brand, CarColorEnum color, Integer seatAmount, String image) {
+        this.brand = brand;
+        this.color = color;
+        this.seatAmount = seatAmount;
+        this.image = image;
+    }
+
+
+
 
     @Override
     public String toString() {
         return "Car{" +
-                "id=" + id +
-                ", brand='" + brand + '\'' +
-                ", color='" + color + '\'' +
-                ", seatAmount=" + seatAmount +
-                ", price=" + price +
-                ", status='" + status + '\'' +
-                '}' + "\n";
+               "id=" + id +
+               ", brand='" + brand + '\'' +
+               ", color=" + color +
+               ", seatAmount=" + seatAmount +
+               ", price=" + price +
+               ", status=" + status +
+               ", image='" + image + '\'' +
+               '}';
     }
 
     @Override
@@ -66,8 +87,6 @@ public class Car {
         this.brand = brand;
     }
 
-
-
     public CarColorEnum getColor() {
         return color;
     }
@@ -84,14 +103,13 @@ public class Car {
         this.seatAmount = seatAmount;
     }
 
-    public BigDecimal getPrice() {
+    public Integer getPrice() {
         return price;
     }
 
-    public void setPrice(BigDecimal price) {
+    public void setPrice(Integer price) {
         this.price = price;
     }
-
 
     public CarStatusEnum getStatus() {
         return status;
@@ -99,5 +117,13 @@ public class Car {
 
     public void setStatus(CarStatusEnum status) {
         this.status = status;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
     }
 }

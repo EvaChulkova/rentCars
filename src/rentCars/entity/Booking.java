@@ -26,6 +26,15 @@ public class Booking {
         this.comment = comment;
     }
 
+    public Booking(Integer clientId, Integer carId, LocalDateTime rentalStart, LocalDateTime rentalFinish, BookingStatusEnum status, String comment) {
+        this.clientId = clientId;
+        this.carId = carId;
+        this.rentalStart = rentalStart;
+        this.rentalFinish = rentalFinish;
+        this.status = status;
+        this.comment = comment;
+    }
+
     public Booking(){}
 
     @Override

@@ -17,6 +17,13 @@ public class Administrator {
         this.roleId = roleId;
     }
 
+    public Administrator(String fio, String login, String password, Integer roleId) {
+        this.fio = fio;
+        this.login = login;
+        this.password = password;
+        this.roleId = roleId;
+    }
+
     @Override
     public String toString() {
         return "Administrator{" +

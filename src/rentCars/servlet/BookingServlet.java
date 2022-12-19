@@ -6,10 +6,9 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import rentCars.service.BookingService;
+import rentCars.util.JSPHelper;
 
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.nio.charset.StandardCharsets;
 
 @WebServlet("/bookings")
 public class BookingServlet extends HttpServlet {
@@ -17,7 +16,12 @@ public class BookingServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        resp.setContentType("text/html");
+        req.setAttribute("bookings", bookingService.findAll());
+
+        req.getRequestDispatcher(JSPHelper.getPath("bookings"))
+                .forward(req, resp);
+
+        /*resp.setContentType("text/html");
         resp.setCharacterEncoding(StandardCharsets.UTF_8.name());
 
         try (PrintWriter printWriter = resp.getWriter()) {
@@ -31,6 +35,6 @@ public class BookingServlet extends HttpServlet {
                         """.formatted(bookingDto.getId(), bookingDto.getDescription()));
             });
             printWriter.write("</ul>");
-        }
+        }*/
     }
 }

@@ -1,13 +1,14 @@
 package rentCars.dao;
 
-import rentCars.filter.CarFilter;
 import rentCars.entity.Car;
 import rentCars.entity.enums.CarColorEnum;
 import rentCars.entity.enums.CarStatusEnum;
 import rentCars.exception.RentCarsDaoException;
+import rentCars.filter.CarFilter;
 import rentCars.util.RentCarsConnectionManager;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -25,8 +26,8 @@ public class CarDao implements DaoRentCar<Long, Car> {
             """;
 
     public static final String ADD_CAR_SQL = """
-            INSERT INTO car(brand, color, seat_amount, price, status) 
-            VALUES (?, ?, ?, ?, ?)
+            INSERT INTO car(brand, color, seat_amount, price, status, image) 
+            VALUES (?, ?, ?, ?, ?, ?)
             """;
 
     public static final String UPDATE_CAR_SQL = """
@@ -35,7 +36,8 @@ public class CarDao implements DaoRentCar<Long, Car> {
             color = ?, 
             seat_amount = ?,
             price = ?,
-            status = ?
+            status = ?,
+            image = ?
             WHERE id = ?
             """;
 
@@ -45,7 +47,8 @@ public class CarDao implements DaoRentCar<Long, Car> {
             color,
             seat_amount,
             price, 
-            status
+            status,
+            image
             FROM car
             """;
 
@@ -158,9 +161,9 @@ public class CarDao implements DaoRentCar<Long, Car> {
                 resultSet.getString("brand"),
                 CarColorEnum.valueOf(resultSet.getObject("color", String.class)),
                 resultSet.getInt("seat_amount"),
-                resultSet.getBigDecimal("price"),
-                CarStatusEnum.valueOf(resultSet.getObject("status", String.class))
-
+                resultSet.getInt("price"),
+                CarStatusEnum.valueOf(resultSet.getObject("status", String.class)),
+                resultSet.getString("image")
         );
     }
 
@@ -168,17 +171,39 @@ public class CarDao implements DaoRentCar<Long, Car> {
     public void update(Car car) {
         try (var connection = RentCarsConnectionManager.open();
         var preparedStatement = connection.prepareStatement(UPDATE_CAR_SQL)) {
-            preparedStatement.setString(1, car.getBrand());
-            preparedStatement.setString(2, car.getColor().name());
-            preparedStatement.setInt(3, car.getSeatAmount());
-            preparedStatement.setBigDecimal(4, car.getPrice());
-            preparedStatement.setString(5, car.getStatus().name());
-            preparedStatement.setLong(6, car.getId());
+            addOrUpdateCar(car, preparedStatement);
+            preparedStatement.setLong(7, car.getId());
 
             preparedStatement.executeUpdate();
         } catch (SQLException throwables) {
             throw new RentCarsDaoException(throwables);
         }
+    }
+
+    @Override
+    public Car add(Car car) {
+        try (var connection = RentCarsConnectionManager.open();
+             var preparedStatement = connection.prepareStatement(ADD_CAR_SQL, Statement.RETURN_GENERATED_KEYS)) {
+            addOrUpdateCar(car, preparedStatement);
+            preparedStatement.executeUpdate();
+
+            var generatedKeys = preparedStatement.getGeneratedKeys();
+            if(generatedKeys.next()) {
+                car.setId(generatedKeys.getLong("id"));
+            }
+            return car;
+        } catch (SQLException throwables) {
+            throw new RentCarsDaoException(throwables);
+        }
+    }
+
+    private void addOrUpdateCar(Car car, PreparedStatement preparedStatement) throws SQLException {
+        preparedStatement.setString(1, car.getBrand());
+        preparedStatement.setString(2, car.getColor().name());
+        preparedStatement.setInt(3, car.getSeatAmount());
+        preparedStatement.setInt(4, car.getPrice());
+        preparedStatement.setString(5, car.getStatus().name());
+        preparedStatement.setString(6, car.getImage());
     }
 
     @Override
@@ -192,27 +217,7 @@ public class CarDao implements DaoRentCar<Long, Car> {
         }
     }
 
-    @Override
-    public Car add(Car car) {
-        try (var connection = RentCarsConnectionManager.open();
-        var preparedStatement = connection.prepareStatement(ADD_CAR_SQL, Statement.RETURN_GENERATED_KEYS)) {
-            preparedStatement.setString(1, car.getBrand());
-            preparedStatement.setString(2, car.getColor().name());
-            preparedStatement.setInt(3, car.getSeatAmount());
-            preparedStatement.setBigDecimal(4, car.getPrice());
-            preparedStatement.setString(5, car.getStatus().name());
 
-            preparedStatement.executeUpdate();
-
-            var generatedKeys = preparedStatement.getGeneratedKeys();
-            if(generatedKeys.next()) {
-                car.setId(generatedKeys.getLong("id"));
-            }
-            return car;
-        } catch (SQLException throwables) {
-            throw new RentCarsDaoException(throwables);
-        }
-    }
 
 
     public static CarDao getInstance() {

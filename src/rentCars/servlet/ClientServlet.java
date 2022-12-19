@@ -6,10 +6,9 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import rentCars.service.ClientService;
+import rentCars.util.JSPHelper;
 
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.nio.charset.StandardCharsets;
 
 @WebServlet("/clients")
 public class ClientServlet extends HttpServlet {
@@ -17,21 +16,9 @@ public class ClientServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        resp.setContentType("text/html");
-        resp.setCharacterEncoding(StandardCharsets.UTF_8.name());
+        req.setAttribute("clients", clientService.findAll());
 
-        try (PrintWriter printWriter = resp.getWriter()) {
-            printWriter.write("<h1>Клиенты:</h1>");
-            printWriter.write("<ul>");
-            clientService.findAll().forEach(clientDto -> {
-                printWriter.write("""
-                        <li>
-                        %d - %s
-                        </li>
-                        """.formatted(clientDto.getId(), clientDto.getDescription()));
-            });
-            printWriter.write("</ul>");
-        }
-
+        req.getRequestDispatcher(JSPHelper.getPath("clients"))
+                        .forward(req, resp);
     }
 }

@@ -4,10 +4,6 @@ import rentCars.dao.AdministratorDao;
 import rentCars.dao.BookingDao;
 import rentCars.dao.CarDao;
 import rentCars.dao.ClientDao;
-import rentCars.filter.AdministratorFilter;
-import rentCars.filter.BookingFilter;
-import rentCars.filter.CarFilter;
-import rentCars.filter.ClientFilter;
 import rentCars.entity.Administrator;
 import rentCars.entity.Booking;
 import rentCars.entity.Car;
@@ -15,8 +11,11 @@ import rentCars.entity.Client;
 import rentCars.entity.enums.BookingStatusEnum;
 import rentCars.entity.enums.CarColorEnum;
 import rentCars.entity.enums.CarStatusEnum;
+import rentCars.filter.AdministratorFilter;
+import rentCars.filter.BookingFilter;
+import rentCars.filter.CarFilter;
+import rentCars.filter.ClientFilter;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -95,7 +94,7 @@ public class DaoRentCarsRunner {
 
 
     private static void findClientWithFilters() {
-        ClientFilter clientFilter = new ClientFilter(5, 0, null, 95443, null);
+        ClientFilter clientFilter = new ClientFilter(5, 0,  95443);
         List<Client> clientWithFilters = ClientDao.getInstance().findClientWithFilters(clientFilter);
         System.out.println(clientWithFilters);
     }
@@ -125,13 +124,10 @@ public class DaoRentCarsRunner {
     private static void addClient() {
         ClientDao clientDao = ClientDao.getInstance();
         Client client = new Client();
-        client.setFio("Сергеев Денис");
         client.setAge(28);
         client.setLicenceNo(100916);
         client.setValidity(LocalDate.of(2029, 3, 11));
-        client.setLogin("den@yandex.ru");
-        client.setPassword("613843");
-        client.setRoleId(2);
+
 
         Client addedClient = clientDao.add(client);
         System.out.println(addedClient);
@@ -203,7 +199,7 @@ public class DaoRentCarsRunner {
 
     private static void deleteCar() {
         var carDao = CarDao.getInstance();
-        var deleteCar = carDao.delete(15L);
+        var deleteCar = carDao.delete(18L);
         System.out.println(deleteCar);
     }
 
@@ -213,7 +209,7 @@ public class DaoRentCarsRunner {
         car.setBrand("Audi RS6");
         car.setColor(CarColorEnum.Red);
         car.setSeatAmount(5);
-        car.setPrice(BigDecimal.valueOf(18150));
+        car.setPrice(18150);
         car.setStatus(CarStatusEnum.AVAILABLE);
 
         var addedCar = carDao.add(car);

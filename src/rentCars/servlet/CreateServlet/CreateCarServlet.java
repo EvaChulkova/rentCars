@@ -1,44 +1,35 @@
-package rentCars.servlet;
+package rentCars.servlet.CreateServlet;
 
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import rentCars.dto.CreateDto.CreateCarDto;
+import rentCars.entity.enums.CarColorEnum;
+import rentCars.entity.enums.CarStatusEnum;
 import rentCars.service.CarService;
 import rentCars.util.JSPHelper;
 
 import java.io.IOException;
 
-@WebServlet("/cars")
-public class CarServlet extends HttpServlet {
+@MultipartConfig(fileSizeThreshold = 1024 * 1024)
+@WebServlet("/add_new_car")
+public class CreateCarServlet extends HttpServlet {
     private final CarService carService = CarService.getInstance();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        req.setAttribute("cars", carService.findAll());
+        req.setAttribute("add_car", carService.findAll());
+        req.setAttribute("color", CarColorEnum.values());
+        req.setAttribute("status", CarStatusEnum.values());
 
-        req.getRequestDispatcher(JSPHelper.getPath("cars"))
+        req.getRequestDispatcher(JSPHelper.getPath("createCar"))
                 .forward(req, resp);
-
-        /*resp.setContentType("text/html");
-        resp.setCharacterEncoding(StandardCharsets.UTF_8.name());
-
-        try (PrintWriter printWriter = resp.getWriter()) {
-            printWriter.write("<h1>Автомобили:</h1>");
-            printWriter.write("<ul>");
-            carService.findAll().forEach(carDto -> {
-                printWriter.write("""
-                        <li>
-                        %d - %s
-                        </li>
-                        """.formatted(carDto.getId(), carDto.getDescription()));
-            });
-            printWriter.write("</ul>");
-        }*/
     }
 
-    /*@Override
+    @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         CreateCarDto createCarDto = CreateCarDto.builder()
                 .brand(req.getParameter("brand"))
@@ -50,6 +41,6 @@ public class CarServlet extends HttpServlet {
                 .build();
 
         carService.create(createCarDto);
-
-    }*/
+        resp.sendRedirect("/cars");
+    }
 }
