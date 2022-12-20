@@ -3,5 +3,6 @@ package rentCars.entity.enums;
 public enum BookingStatusEnum {
     APPROVED,
     REJECTED,
-    COMPLETED
+    COMPLETED,
+    IN_PROGRESS
 }

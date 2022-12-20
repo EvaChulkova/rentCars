@@ -1,5 +1,6 @@
 package rentCars.dao;
 
+import lombok.SneakyThrows;
 import rentCars.entity.User;
 import rentCars.entity.enums.RoleEnum;
 import rentCars.exception.RentCarsDaoException;
@@ -46,6 +47,16 @@ public class UserDao implements DaoRentCar<Integer, User> {
 
     public static final String FIND_USER_BY_ID_SQL = FIND_ALL_USERS_SQL + """
             WHERE id = ?
+            """;
+
+    private static final String FIND_USER_BY_LOGIN_AND_PASSWORD_SQL = """
+            SELECT id,
+            fio,
+            login,
+            password,
+            role 
+            FROM users 
+            WHERE login = ? AND password = ?
             """;
 
 
@@ -124,14 +135,20 @@ public class UserDao implements DaoRentCar<Integer, User> {
         }
     }
 
-    private User buildUser(ResultSet resultSet) throws SQLException {
-        return User.builder()
-                .id(resultSet.getObject("id", Integer.class))
-                .fio(resultSet.getObject("fio", String.class))
-                .login(resultSet.getObject("login", String.class))
-                .password(resultSet.getObject("password", String.class))
-                .role(RoleEnum.valueOf(resultSet.getObject("role", String.class)))
-                .build();
+    @SneakyThrows
+    public Optional<User> findByEmailAndPassword(String login, String password) {
+        try (Connection connection = RentCarsConnectionManager.open();
+             var preparedStatement = connection.prepareStatement(FIND_USER_BY_LOGIN_AND_PASSWORD_SQL)) {
+            preparedStatement.setString(1, login);
+            preparedStatement.setString(2, password);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+            User user = null;
+            if (resultSet.next()) {
+                user = buildUser(resultSet);
+            }
+            return Optional.ofNullable(user);
+        }
     }
 
     @Override
@@ -147,6 +164,16 @@ public class UserDao implements DaoRentCar<Integer, User> {
         } catch (SQLException throwables) {
             throw new RentCarsDaoException(throwables);
         }
+    }
+
+    private User buildUser(ResultSet resultSet) throws SQLException {
+        return User.builder()
+                .id(resultSet.getObject("id", Integer.class))
+                .fio(resultSet.getObject("fio", String.class))
+                .login(resultSet.getObject("login", String.class))
+                .password(resultSet.getObject("password", String.class))
+                .role(RoleEnum.valueOf(resultSet.getObject("role", String.class)))
+                .build();
     }
 
     public static UserDao getInstance(){

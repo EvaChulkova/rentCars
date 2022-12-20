@@ -10,13 +10,15 @@ import rentCars.service.ImageService;
 import java.io.IOException;
 import java.io.InputStream;
 
-@WebServlet("/images" + "/*")
+import static rentCars.util.UrlPath.IMAGES;
+
+@WebServlet(IMAGES + "/*")
 public class ImageServlet extends HttpServlet {
     private final ImageService imageService = ImageService.getInstance();
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String requestURI = req.getRequestURI();
-        var imagePath = requestURI.replace("/images", "");
+        var imagePath = requestURI.replace(IMAGES, "");
 
         imageService.get(imagePath)
                 .ifPresentOrElse(image -> {

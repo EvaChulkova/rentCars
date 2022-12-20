@@ -13,7 +13,9 @@ import rentCars.util.JSPHelper;
 
 import java.io.IOException;
 
-@WebServlet("/registration")
+import static rentCars.util.UrlPath.REGISTRATION;
+
+@WebServlet(REGISTRATION)
 public class RegistrationServlet extends HttpServlet {
     private final UserService userService = UserService.getInstance();
 

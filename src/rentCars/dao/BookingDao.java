@@ -19,7 +19,6 @@ import java.util.stream.Collectors;
 
 public class BookingDao implements DaoRentCar<Long, Booking> {
     public static final BookingDao INSTANCE = new BookingDao();
-    private final AdministratorDao administratorDao = AdministratorDao.getInstance();
     private final ClientDao clientDao = ClientDao.getInstance();
     private final CarDao carDao = CarDao.getInstance();
 

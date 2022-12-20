@@ -1,17 +1,14 @@
 package rentCars;
 
-import rentCars.dao.AdministratorDao;
 import rentCars.dao.BookingDao;
 import rentCars.dao.CarDao;
 import rentCars.dao.ClientDao;
-import rentCars.entity.Administrator;
 import rentCars.entity.Booking;
 import rentCars.entity.Car;
 import rentCars.entity.Client;
 import rentCars.entity.enums.BookingStatusEnum;
 import rentCars.entity.enums.CarColorEnum;
 import rentCars.entity.enums.CarStatusEnum;
-import rentCars.filter.AdministratorFilter;
 import rentCars.filter.BookingFilter;
 import rentCars.filter.CarFilter;
 import rentCars.filter.ClientFilter;
@@ -29,17 +26,13 @@ public class DaoRentCarsRunner {
         //findAllCars();
         //findCarWithFilter();
 
-        //addAdmin();
-        //deleteAdmin();
-        //updateAdmin();
-        //findAllAdmins();
-        //findAdminWithFilters();
-
         //addClient();
         //deleteClient();
         //findAllClients();
         //updateClient();
         //findClientWithFilters();
+        // findClientByUserId();
+
 
         //addBooking();
         //deleteBooking();
@@ -47,6 +40,11 @@ public class DaoRentCarsRunner {
         //updateBooking();
         //findBookingWithFilters();
 
+    }
+
+    private static void findClientByUserId() {
+        Optional<Integer> clientIdByUserId = ClientDao.getInstance().findClientIdByUserId(2);
+        System.out.println(clientIdByUserId);
     }
 
     private static void findBookingWithFilters() {
@@ -131,47 +129,6 @@ public class DaoRentCarsRunner {
 
         Client addedClient = clientDao.add(client);
         System.out.println(addedClient);
-    }
-
-
-    private static void findAdminWithFilters() {
-        AdministratorFilter administratorFilter = new AdministratorFilter(10, 0, "Денисова", null);
-        List<Administrator> adminWithFilters = AdministratorDao.getInstance().findAdminWithFilters(administratorFilter);
-        System.out.println(adminWithFilters);
-    }
-
-    private static void updateAdmin() {
-        AdministratorDao administratorDao = AdministratorDao.getInstance();
-        Optional<Administrator> maybeAdmin = administratorDao.findById(2L);
-        System.out.println(maybeAdmin);
-
-        maybeAdmin.ifPresent(administrator -> {
-            administrator.setPassword("newAgain");
-            administratorDao.update(administrator);
-        });
-    }
-
-    private static void findAllAdmins() {
-        List<Administrator> allAdmins = AdministratorDao.getInstance().findAll();
-        System.out.println(allAdmins);
-    }
-
-    private static void deleteAdmin() {
-        AdministratorDao administratorDao = AdministratorDao.getInstance();
-        boolean deleteAdmin = administratorDao.delete(5L);
-        System.out.println(deleteAdmin);
-    }
-
-    private static void addAdmin() {
-        AdministratorDao administratorDao = AdministratorDao.getInstance();
-        Administrator administrator = new Administrator();
-        administrator.setFio("Петров Валерий");
-        administrator.setLogin("val@yandex.ru");
-        administrator.setPassword("98765");
-        administrator.setRoleId(1);
-
-        Administrator addAdmin = administratorDao.add(administrator);
-        System.out.println(addAdmin);
     }
 
 
